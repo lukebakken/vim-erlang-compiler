@@ -684,11 +684,17 @@ remove_warnings_as_errors(ErlOpts) ->
 %% @doc Set code paths and options for a simple Makefile
 %% @end
 %%------------------------------------------------------------------------------
+%% TODO only first makefile is parsed, should also work up the tree for deps
+%% and what-not
 -spec load_makefiles([string()]) -> {ok, [{atom(), term()}]} | error.
 load_makefiles([Makefile|_Rest]) ->
     Path = filename:dirname(Makefile),
+    % TODO io:format("Makefile Path: ~p~n", [Path]),
     code:add_pathsa([absname(Path, "ebin")]),
-    code:add_pathsa(filelib:wildcard(absname(Path, "deps") ++ "/*/ebin")),
+    % TODO io:format("Deps Path: ~p~n", [absname(Path, "deps")]),
+    DepsPaths = filelib:wildcard(absname(Path, "deps") ++ "/*/ebin"),
+    % TODO io:format("DepsPaths: ~p~n", [DepsPaths]),
+    code:add_pathsa(DepsPaths),
     code:add_pathsa(filelib:wildcard(absname(Path, "lib") ++ "/*/ebin")),
     {opts, [{i, absname(Path, "include")},
             {i, absname(Path, "deps")},
